@@ -1,0 +1,4 @@
+name: temp-postgresql
+version: 1.0.0
+sources:
+  - https://hub.docker.com/_/postgres

@@ -1,0 +1,46 @@
+apiVersion: batch/v1
+kind: Job
+
+metadata:
+  name: {{ .Values.appName }}-db-migrate
+  labels:
+    app: {{ .Values.appName }}
+    heritage: {{ .Release.Service }}
+    release: {{ .Release.Name }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    environment: {{ .Values.global.environment }}
+
+  annotations:
+    "helm.sh/hook": pre-upgrade
+    "helm.sh/hook-delete-policy": hook-succeeded
+    "helm.sh/hook-weight": "1"
+
+spec:
+  activeDeadlineSeconds: 600
+  template:
+    metadata:
+      name: {{ .Values.appName }}-db-migrate
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: {{ .Values.appName }}-migration-job
+        image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+        command:
+          - bundle
+          - exec
+          - rails
+          - db:migrate
+
+        envFrom:
+          - configMapRef:
+              name: {{ .Values.appName }}-config
+          - secretRef:
+              name: {{ .Values.appName }}-secrets
+
+        resources:
+          requests:
+            cpu: 100m
+            memory: 250Mi
+          limits:
+            cpu: 200m
+            memory: 500Mi

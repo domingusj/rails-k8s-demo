@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.appName }}
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+        app: {{ .Values.appName }}
+        component: database
+        release: {{ .Release.Name }}
+
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/secrets.yaml") . | sha256sum }}
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+      labels:
+        app: {{ .Values.appName }}
+        heritage: {{ .Release.Service }}
+        release: {{ .Release.Name }}
+        chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+        environment: {{ .Values.global.environment }}
+        component: database
+    spec:
+      containers:
+      - name: {{ .Values.appName }}
+        image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+
+        envFrom:
+          - configMapRef:
+              name: {{ .Values.appName }}-config
+          - secretRef:
+              name: {{ .Values.appName }}-secrets
+
+        livenessProbe:
+          tcpSocket:
+            port: {{ .Values.global.POSTGRESQL_PORT_NUMBER }}
+          initialDelaySeconds: 60
+        readinessProbe:
+          tcpSocket:
+            port: {{ .Values.global.POSTGRESQL_PORT_NUMBER }}
+          initialDelaySeconds: 10
+
+        ports:
+          - name: db-port
+            containerPort: {{ .Values.global.POSTGRESQL_PORT_NUMBER }}
+
+        resources:
+          requests:
+            cpu: 50m
+            memory: 100Mi

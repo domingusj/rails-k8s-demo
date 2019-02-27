@@ -1,0 +1,18 @@
+replicas: 3
+
+# child charts
+cloudsql-proxy:
+  enabled: true
+  gcpProject: domingusj-182921
+  gcpRegion: us-west1
+  cloudSQLInstanceName: prod-rails-k8s-demo
+
+temp-postgresql:
+  enabled: false
+
+global:
+  environment: prod
+  RAILS_ENV: production
+  DATABASE_USERNAME: rails
+  DATABASE_HOST: cloudsql-proxy-service
+  DATABASE_NAME: prod-rails-k8s-demo

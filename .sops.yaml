@@ -1,0 +1,9 @@
+creation_rules:
+  - path_regex: k8s/rails-k8s-demo/dev-secrets\.yaml$
+    gcp_kms: projects/domingusj-182921/locations/global/keyRings/dev/cryptoKeys/rails-k8s-demo
+
+  - path_regex: k8s/rails-k8s-demo/stage-secrets\.yaml$
+    gcp_kms: projects/domingusj-182921/locations/global/keyRings/stage/cryptoKeys/rails-k8s-demo
+
+  - path_regex: k8s/rails-k8s-demo/prod-secrets\.yaml$
+    gcp_kms: projects/domingusj-182921/locations/global/keyRings/prod/cryptoKeys/rails-k8s-demo

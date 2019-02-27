@@ -1,0 +1,6 @@
+appName: cloudsql-proxy
+
+image:
+  repository: gcr.io/cloudsql-docker/gce-proxy
+  tag: 1.13
+

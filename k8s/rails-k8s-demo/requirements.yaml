@@ -1,0 +1,8 @@
+dependencies:
+  - name: cloudsql-proxy
+    version: ~1.0.0
+    condition: cloudsql-proxy.enabled
+
+  - name: temp-postgresql
+    version: ~1.0.0
+    condition: temp-postgresql.enabled

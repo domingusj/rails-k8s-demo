@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.appName }}
+spec:
+  replicas: {{ .Values.replicas }}
+
+  selector:
+    matchLabels:
+        app: {{ .Values.appName }}
+        component: web
+        release: {{ .Release.Name }}
+
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/secrets.yaml") . | sha256sum }}
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+
+      labels:
+        app: {{ .Values.appName }}
+        heritage: {{ .Release.Service }}
+        release: {{ .Release.Name }}
+        chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+        environment: {{ .Values.global.environment }}
+        component: web
+
+    spec:
+      containers:
+      - name: {{ .Values.appName }}
+        image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+
+        envFrom:
+          - configMapRef:
+              name: {{ .Values.appName }}-config
+          - secretRef:
+              name: {{ .Values.appName }}-secrets
+
+        resources:
+          requests:
+            cpu: 100m
+            memory: 250Mi
+          limits:
+            cpu: 200m
+            memory: 500Mi
+
+        ports:
+          - containerPort: {{ .Values.servicePort }}
+
+        livenessProbe:
+          httpGet:
+            path: /health_check
+            port: {{ .Values.servicePort }}
+          initialDelaySeconds: 60
+        readinessProbe:
+          httpGet:
+            path: /health_check
+            port: {{ .Values.servicePort }}
+          initialDelaySeconds: 10
+
+          securityContext:
+            runAsUser: 2  # non-root user
+            allowPrivilegeEscalation: false
+

@@ -1,0 +1,16 @@
+.git
+.gitignore
+README.md
+
+.bundle
+
+.ruby-version
+.ruby-gemset
+
+log
+tmp
+
+k8s
+deploy
+
+.sops.yaml

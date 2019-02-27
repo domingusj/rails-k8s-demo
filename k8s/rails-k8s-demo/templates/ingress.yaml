@@ -1,0 +1,23 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: {{ .Values.appName }}-ingress
+  labels:
+    app: {{ .Values.appName }}
+    heritage: {{ .Release.Service }}
+    release: {{ .Release.Name }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    environment: {{ .Values.global.environment }}
+spec:
+  tls:
+  - hosts:
+    - {{ .Values.global.environment }}-{{ .Values.appName }}.{{ .Values.domain }}
+    secretName: {{ .Values.global.environment }}-{{ .Values.appName }}-tls
+  rules:
+  - host: {{ .Values.global.environment }}-{{ .Values.appName }}.{{ .Values.domain }}
+    http:
+      paths:
+      - path: /*
+        backend:
+          serviceName: {{ .Values.appName }}-service
+          servicePort: {{ .Values.servicePort }}

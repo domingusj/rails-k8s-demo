@@ -1,0 +1,4 @@
+name: cloudsql-proxy
+version: 1.0.0
+sources:
+  - https://github.com/GoogleCloudPlatform/cloudsql-proxy

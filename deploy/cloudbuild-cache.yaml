@@ -1,0 +1,21 @@
+steps:
+
+  - id: 'build-cache-runtime'
+    name: 'gcr.io/cloud-builders/docker'
+    entrypoint: 'bash'
+    args:
+    - -c
+    - |
+      docker build --build-arg bundle_without="development:test" --build-arg rails_env="production" -t gcr.io/${PROJECT_ID}/${_APP_NAME}:cache-runtime .
+
+  - id: 'build-cache-test'
+    name: 'gcr.io/cloud-builders/docker'
+    entrypoint: 'bash'
+    args:
+    - -c
+    - |
+      docker build --build-arg bundle_without="development" --build-arg rails_env="test" -t gcr.io/${PROJECT_ID}/${_APP_NAME}:cache-test .
+
+images:
+  - gcr.io/${PROJECT_ID}/${_APP_NAME}:cache-runtime
+  - gcr.io/${PROJECT_ID}/${_APP_NAME}:cache-test

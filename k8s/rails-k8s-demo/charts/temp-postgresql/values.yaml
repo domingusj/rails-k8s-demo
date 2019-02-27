@@ -1,0 +1,6 @@
+appName: temp-postgres
+
+image:
+  repository: postgres
+  tag: 9.6
+

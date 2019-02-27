@@ -1,0 +1,27 @@
+appName: rails-k8s-demo
+
+image:
+  repository: gcr.io/domingusj-182921/rails-k8s-demo
+  tag: latest
+
+replicas: 2
+
+servicePort: 3000
+
+domain: domingus.dev
+
+# child charts
+cloudsql-proxy:
+  enabled: false
+
+temp-postgresql:
+  enabled: true
+
+# global values available to all charts
+global:
+  environment: dev
+  RAILS_ENV: development
+  DATABASE_HOST: postgres-service
+  DATABASE_PASSWORD: ""
+  DATABASE_NAME: "dev-rails-k8s-demo"
+  POSTGRESQL_PORT_NUMBER: 5432

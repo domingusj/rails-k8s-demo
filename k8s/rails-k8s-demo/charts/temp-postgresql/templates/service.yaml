@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.appName }}-service
+  labels:
+    app: {{ .Values.appName }}-service
+    heritage: {{ .Release.Service }}
+    release: {{ .Release.Name }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    environment: {{ .Values.global.environment }}
+    component: database
+spec:
+  ports:
+  - port: {{ .Values.global.POSTGRESQL_PORT_NUMBER }}
+    targetPort: db-port
+  selector:
+    app: {{ .Values.appName }}
+    component: database
+    release: {{ .Release.Name }}

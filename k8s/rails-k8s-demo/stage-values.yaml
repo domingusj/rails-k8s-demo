@@ -1,0 +1,6 @@
+global:
+  environment: stage
+  RAILS_ENV: staging
+  DATABASE_USERNAME: rails
+  DATABASE_HOST: temp-postgres-service
+  DATABASE_NAME: stage-rails-k8s-demo

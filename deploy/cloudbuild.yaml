@@ -1,0 +1,60 @@
+steps:
+
+  - id: 'pull-cache-test'
+    name: 'gcr.io/cloud-builders/docker'
+    args:
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        docker pull gcr.io/${PROJECT_ID}/${_APP_NAME}:cache-test || true
+    waitFor: ['-']
+
+  - id: 'pull-cache-runtime'
+    name: 'gcr.io/cloud-builders/docker'
+    args:
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        docker pull gcr.io/${PROJECT_ID}/${_APP_NAME}:cache-runtime || true
+    waitFor: ['-']
+
+  - id: kubeval
+    name: cloudnatived/helm-cloudbuilder
+    entrypoint: sh
+    args:
+      - -c
+      - |
+        helm template ./k8s/${_APP_NAME}/ | kubeval
+    waitFor: ['-']
+
+  - id: build-test-image
+    name: gcr.io/cloud-builders/docker
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        docker image build --cache-from=gcr.io/${PROJECT_ID}/${_APP_NAME}:cache-test --build-arg bundle_without="development" --build-arg rails_env="test" -t app-test:${COMMIT_SHA} .
+    waitFor: ['pull-cache-test']
+
+  - id: build-runtime-image
+    name: gcr.io/cloud-builders/docker
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        docker image build --cache-from=gcr.io/${PROJECT_ID}/${_APP_NAME}:cache-runtime --build-arg bundle_without="development:test" --build-arg rails_env="production" -t gcr.io/${PROJECT_ID}/${_APP_NAME}:${COMMIT_SHA} .
+    waitFor: ['pull-cache-runtime']
+
+  - id: run-tests
+    name: gcr.io/cloud-builders/docker
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        docker container run app-test:${COMMIT_SHA} bundle exec rspec
+    waitFor: ['build-test-image']
+
+images:
+  - gcr.io/${PROJECT_ID}/${_APP_NAME}:${COMMIT_SHA}
