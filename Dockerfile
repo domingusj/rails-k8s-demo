@@ -1,4 +1,4 @@
-FROM ruby:2.5
+FROM ruby:2.7.3
 
 ARG bundle_without=""
 ENV BUNDLE_WITHOUT ${bundle_without}
