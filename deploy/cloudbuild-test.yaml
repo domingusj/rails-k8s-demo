@@ -1,0 +1,30 @@
+steps:
+
+  - id: 'pull-db'
+    name: 'gcr.io/cloud-builders/docker'
+    args:
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        docker pull postgres:11
+    waitFor: ['-']
+
+  - id: 'pull-redis'
+    name: 'gcr.io/cloud-builders/docker'
+    args:
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        docker pull redis:4
+    waitFor: ['-']
+
+  - id: build-test-image
+    name: gcr.io/cloud-builders/docker
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        docker image build --cache-from=gcr.io/${PROJECT_ID}/${_APP_NAME}:cache-test --build-arg bundle_without="development" --build-arg rails_env="test" -t app-test:${COMMIT_SHA} .
+    waitFor: ['-']
