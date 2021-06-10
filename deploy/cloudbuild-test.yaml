@@ -26,5 +26,8 @@ steps:
     args:
       - -c
       - |
-        docker image build --cache-from=gcr.io/${PROJECT_ID}/${_APP_NAME}:cache-test --build-arg bundle_without="development" --build-arg rails_env="test" -t app-test:${COMMIT_SHA} .
+        docker image build --build-arg bundle_without="development" --build-arg rails_env="production" -t gcr.io/${PROJECT_ID}/rails-test:${COMMIT_SHA} .
     waitFor: ['-']
+
+images:
+  - gcr.io/${PROJECT_ID}/rails-test:${COMMIT_SHA}
